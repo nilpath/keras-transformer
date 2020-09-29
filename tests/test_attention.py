@@ -4,6 +4,8 @@ import tensorflow as tf
 from keras_transformer.attention import scaled_dot_product_attention
 
 
+# skipping the test_session method
+# https://stackoverflow.com/questions/55417214/phantom-tests-after-switching-from-unittest-testcase-to-tf-test-testcase
 class ScaledDotProductAttentionTest(tf.test.TestCase):
     def setUp(self):
         super(ScaledDotProductAttentionTest, self).setUp()
