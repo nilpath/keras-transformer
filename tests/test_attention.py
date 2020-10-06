@@ -1,9 +1,10 @@
-import pytest
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
 from keras_transformer.attention import (
-    scaled_dot_product_attention, create_look_ahead_mask
+    MultiHeadAttention,
+    create_look_ahead_mask,
+    scaled_dot_product_attention,
 )
 
 
@@ -51,3 +52,22 @@ class CreateLookAheadMaskTest(tf.test.TestCase):
         ])
         mask = create_look_ahead_mask(3)
         self.assertAllEqual(mask, expected_mask)
+
+
+class MultiHeadAttentionTest(tf.test.TestCase):
+    def test_correct_output_shapes(self):
+        d_model = 12
+        heads = 3
+        batch_size = 2
+        seq_len = 3
+        embedding_length = 4
+
+        query = tf.ones([batch_size, seq_len, embedding_length])
+        key = tf.ones([batch_size, seq_len, embedding_length])
+        value = tf.ones([batch_size, seq_len, embedding_length])
+
+        multihead_attention = MultiHeadAttention(d_model, heads)
+
+        output = multihead_attention(query, key, value)
+
+        self.assertShapeEqual(np.zeros((batch_size, seq_len, d_model)), output)

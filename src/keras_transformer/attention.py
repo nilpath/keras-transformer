@@ -39,3 +39,54 @@ def scaled_dot_product_attention(
 
     output = tf.matmul(p_attn, value)
     return output, p_attn
+
+
+class MultiHeadAttention(tf.keras.layers.Layer):
+    def __init__(self, d_model, num_heads, dropout=0.1):
+        super(MultiHeadAttention, self).__init__()
+        self._num_heads = num_heads
+        self._d_model = d_model
+        assert d_model % num_heads == 0
+        self._d_kv = d_model // num_heads
+
+        self._wq = tf.keras.layers.Dense(d_model)  # TODO: Impl our own  dense block?
+        self._wk = tf.keras.layers.Dense(d_model)  # TODO: Impl our own  dense block?
+        self._wv = tf.keras.layers.Dense(d_model)  # TODO: Impl our own  dense block?
+        self._wout = tf.keras.layers.Dense(d_model)  # TODO: Impl our own dense block?
+
+        self._attn = None
+        self._dropout = tf.keras.layers.Dropout(dropout)
+
+    def _transform_input(self, x, batch_size):
+        # reshape and transpose (batch_size, seq_length, embedding_size) to
+        # (batch_size, h, seq_len, embedding_size)
+        x = tf.reshape(x, (batch_size, -1, self._num_heads, self._d_kv))
+        return tf.transpose(x, perm=[0, 2, 1, 3])
+
+    def call(
+        self,
+        query: tf.Tensor,
+        key: tf.Tensor,
+        value: tf.Tensor,
+        mask: tf.Tensor = None,
+    ):
+        # q, v, k shapes = (batch_size, seq_length, embedding_size)?
+        batch_size = tf.shape(query)[0]
+
+        # Linear layers
+        query, key, value = [
+            self._transform_input(layer(x), batch_size)
+            for layer, x in zip((self._wq, self._wk, self._wv), (query, key, value))
+        ]
+
+        # Attention
+        x, self._attn = scaled_dot_product_attention(
+            query, key, value, mask, dropout=self._dropout
+        )
+
+        # Concatenate
+        x = tf.transpose(x, perm=[0, 2, 1, 3])
+        x = tf.reshape(x, (batch_size, -1, self._d_model))
+
+        # Final linear
+        return self._wout(x)
