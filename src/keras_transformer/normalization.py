@@ -13,4 +13,4 @@ class LayerNorm(tf.keras.layers.Layer):
     def call(self, x):
         mean = tf.math.reduce_mean(x, axis=-1, keepdims=True)
         std = tf.math.reduce_std(x, axis=-1, keepdims=True)
-        return self.a_2 * (x - mean) / (std * self.eps) + self.b_2
+        return self.a_2 * (x - mean) / (std + self.eps) + self.b_2
