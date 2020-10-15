@@ -16,13 +16,14 @@ class EncoderDecoder(tf.keras.layers.Layer):
         self.tgt_embed = tgt_embed
 
     def call(self, src, tgt, src_mask, tgt_mask):
-        return self.decode(self.encode(src, src_mask))
+        memory = self.encode(src, src_mask)
+        return self.decode(memory, src_mask, tgt, tgt_mask)
 
     def encode(self, src, src_mask):
-        return self.encoder(self.src_embed[src], src_mask)
+        return self.encoder(self.src_embed(src), src_mask)
 
     def decode(self, memory, src_mask, tgt, tgt_mask):
-        return self.decoder(self.tgt_embed[tgt], memory, src_mask, tgt_mask)
+        return self.decoder(self.tgt_embed(tgt), memory, src_mask, tgt_mask)
 
 
 class Encoder(tf.keras.layers.Layer):
@@ -39,6 +40,9 @@ class Encoder(tf.keras.layers.Layer):
 
 class EncoderLayer(tf.keras.layers.Layer):
     def __init__(self, d_model, num_head, d_ff, dropout=0.1):
+        super(EncoderLayer, self).__init__()
+        self.size = d_model
+
         self.attention = MultiHeadAttention(d_model, num_head)
         self.norm1 = LayerNorm(d_model)
         self.dropout1 = tf.keras.layers.Dropout(dropout)
@@ -73,6 +77,7 @@ class Decoder(tf.keras.layers.Layer):
 class DecoderLayer(tf.keras.layers.Layer):
     def __init__(self, d_model, num_head, d_ff, dropout=0.1):
         super(DecoderLayer, self).__init__()
+        self.size = d_model
 
         self.attention = MultiHeadAttention(d_model, num_head)
         self.norm1 = LayerNorm(d_model)
