@@ -5,7 +5,7 @@ from keras_transformer.attention import create_look_ahead_mask
 
 
 def synthetic_data(nbatches, batch_size, vec_length, vec_min=1, vec_max=11):
-    size = (nbatches*batch_size, vec_length)
+    size = (nbatches * batch_size, vec_length)
     data = np.random.randint(vec_min, vec_max, size=size)
 
     def generate_masks(x, y):
