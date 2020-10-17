@@ -26,13 +26,14 @@ def create_model(src_vocab, tgt_vocab, N=6, d_model=512, d_ff=2048, h=8, dropout
         Decoder(DecoderLayer(d_model, h, d_ff, dropout), N),
         tf.keras.Sequential(
             [Embeddings(src_vocab, d_model), PositionalEncoding(d_model, dropout)]
-        ),  # TODO: Add position wise encoding
+        ),
         tf.keras.Sequential(
             [Embeddings(tgt_vocab, d_model), PositionalEncoding(d_model, dropout)]
-        ),  # TODO: Add position wise encoding
+        ),
     )
 
-    output = transformer(inputs, targets, inputs_mask, targets_mask)
+    x = transformer(inputs, targets, inputs_mask, targets_mask)
+    output = tf.keras.layers.Dense(tgt_vocab)(x)
 
     model = tf.keras.Model([inputs, targets, inputs_mask, targets_mask], output)
 

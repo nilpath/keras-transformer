@@ -35,7 +35,7 @@ class Encoder(tf.keras.layers.Layer):
     def call(self, x, mask):
         for layer in self.layers:
             x = layer(x, mask)
-        return self.norm(x)
+        return self.norm(x)  # (batch_size, input_seq_len, d_model)
 
 
 class EncoderLayer(tf.keras.layers.Layer):
@@ -59,7 +59,7 @@ class EncoderLayer(tf.keras.layers.Layer):
         x_norm = self.norm2(x)
         out = self.feedforward(x_norm)
         x = x + self.dropout2(out)
-        return x
+        return x  # (batch_size, input_seq_len, d_model)
 
 
 class Decoder(tf.keras.layers.Layer):

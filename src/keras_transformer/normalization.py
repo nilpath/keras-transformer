@@ -11,6 +11,7 @@ class LayerNorm(tf.keras.layers.Layer):
         self.eps = eps
 
     def call(self, x):
+        x = tf.cast(x, dtype=tf.float32)
         mean = tf.math.reduce_mean(x, axis=-1, keepdims=True)
         std = tf.math.reduce_std(x, axis=-1, keepdims=True)
         return self.a_2 * (x - mean) / (std + self.eps) + self.b_2
