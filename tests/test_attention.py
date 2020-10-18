@@ -1,11 +1,8 @@
 import numpy as np
 import tensorflow as tf
 
-from keras_transformer.attention import (
-    MultiHeadAttention,
-    create_look_ahead_mask,
-    scaled_dot_product_attention,
-)
+from keras_transformer.attention import MultiHeadAttention, scaled_dot_product_attention
+from keras_transformer.masking import create_look_ahead_mask
 
 
 # skipping the test_session method
@@ -43,19 +40,6 @@ class ScaledDotProductAttentionTest(tf.test.TestCase):
             self.assertAllGreaterEqual(expected_val, target_val)
 
 
-class CreateLookAheadMaskTest(tf.test.TestCase):
-    def test_create_mask(self):
-        expected_mask = tf.constant(
-            [
-                [0, 1, 1],
-                [0, 0, 1],
-                [0, 0, 0],
-            ]
-        )
-        mask = create_look_ahead_mask(3)
-        self.assertAllEqual(mask, expected_mask)
-
-
 class MultiHeadAttentionTest(tf.test.TestCase):
     def test_correct_output_shapes(self):
         d_model = 12
@@ -73,3 +57,17 @@ class MultiHeadAttentionTest(tf.test.TestCase):
         output = multihead_attention(query, key, value)
 
         self.assertShapeEqual(np.zeros((batch_size, seq_len, d_model)), output)
+
+    def test_masking_gets_applied(self):
+        d_model = 12
+        heads = 3
+        batch_size = 2
+        seq_len = 10
+        embedding_length = 4
+        mask = create_look_ahead_mask(seq_len)
+
+        query = tf.ones([batch_size, seq_len, embedding_length])
+        key = tf.ones([batch_size, seq_len, embedding_length])
+        value = tf.ones([batch_size, seq_len, embedding_length])
+
+        MultiHeadAttention(d_model, heads)(query, key, value, mask)

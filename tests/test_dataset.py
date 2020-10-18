@@ -1,19 +1,32 @@
+import numpy as np
 import tensorflow as tf
 
 from keras_transformer.dataset import synthetic_data
 
 
 class SyntheticDataTest(tf.test.TestCase):
-    def test_input_same_as_output(self):
+    def test_src_same_as_tgt(self):
         dataset = synthetic_data(20, 30, 10)
-        for train, test, _, _ in dataset:
-            self.assertAllEqual(train, test)
+        for x, _ in dataset:
+            src, tgt = x
+            self.assertAllEqual(src, tgt)
 
-    def test_mask_shapes(self):
-        dataset = synthetic_data(20, 30, 10)
-        for x, y, x_mask, y_mask in dataset:
-            for x, y, x_mask, y_mask in zip(x, y, x_mask, y_mask):
-                self.assertEqual(len(x), tf.shape(x_mask)[0])
-                self.assertEqual(len(x), tf.shape(x_mask)[1])
-                self.assertEqual(len(y), tf.shape(y_mask)[0])
-                self.assertEqual(len(y), tf.shape(y_mask)[1])
+    def test_src_tgt_shapes(self):
+        nbatches = 20
+        batch_size = 30
+        seq_len = 40
+        vocab_size = 800
+        dataset = synthetic_data(nbatches, batch_size, seq_len, vec_max=vocab_size)
+        for x, y in dataset:
+            src, tgt = x
+            self.assertShapeEqual(np.zeros((batch_size, seq_len)), src)
+            self.assertShapeEqual(np.zeros((batch_size, seq_len)), tgt)
+
+    def test_label_shapes(self):
+        nbatches = 20
+        batch_size = 30
+        seq_len = 40
+        vocab_size = 800
+        dataset = synthetic_data(nbatches, batch_size, seq_len, vec_max=vocab_size)
+        for _, y in dataset:
+            self.assertShapeEqual(np.zeros((batch_size, seq_len, vocab_size)), y)

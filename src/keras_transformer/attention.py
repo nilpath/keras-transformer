@@ -3,10 +3,6 @@ from typing import Tuple
 import tensorflow as tf
 
 
-def create_look_ahead_mask(size):
-    return 1 - tf.linalg.band_part(tf.ones((size, size)), -1, 0)
-
-
 def scaled_dot_product_attention(
     query: tf.Tensor,
     key: tf.Tensor,

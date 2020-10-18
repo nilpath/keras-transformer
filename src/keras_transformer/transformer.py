@@ -15,7 +15,7 @@ class EncoderDecoder(tf.keras.layers.Layer):
         self.src_embed = src_embed
         self.tgt_embed = tgt_embed
 
-    def call(self, src, tgt, src_mask, tgt_mask):
+    def call(self, src, tgt, src_mask=None, tgt_mask=None):
         memory = self.encode(src, src_mask)
         return self.decode(memory, src_mask, tgt, tgt_mask)
 
@@ -32,9 +32,9 @@ class Encoder(tf.keras.layers.Layer):
         self.layers = [copy.deepcopy(layer) for _ in range(N)]
         self.norm = LayerNorm(layer.size)
 
-    def call(self, x, mask):
+    def call(self, x, masks):
         for layer in self.layers:
-            x = layer(x, mask)
+            x = layer(x, masks)
         return self.norm(x)  # (batch_size, input_seq_len, d_model)
 
 
@@ -51,9 +51,9 @@ class EncoderLayer(tf.keras.layers.Layer):
         self.norm2 = LayerNorm(d_model)
         self.dropout2 = tf.keras.layers.Dropout(dropout)
 
-    def call(self, x, mask):
+    def call(self, x, masks):
         x_norm = self.norm1(x)
-        out = self.attention(x_norm, x_norm, x_norm, mask)
+        out = self.attention(x_norm, x_norm, x_norm, masks)
         x = x + self.dropout1(out)
 
         x_norm = self.norm2(x)
