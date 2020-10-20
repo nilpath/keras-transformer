@@ -8,8 +8,10 @@ from keras_transformer.normalization import LayerNorm
 
 
 class EncoderDecoder(tf.keras.layers.Layer):
-    def __init__(self, encoder, decoder, src_embed, tgt_embed):
-        super(EncoderDecoder, self).__init__()
+    def __init__(
+        self, encoder, decoder, src_embed, tgt_embed, name="encoder_decoder", **kwargs
+    ):
+        super(EncoderDecoder, self).__init__(name=name, **kwargs)
         self.encoder = encoder
         self.decoder = decoder
         self.src_embed = src_embed
@@ -27,8 +29,10 @@ class EncoderDecoder(tf.keras.layers.Layer):
 
 
 class Encoder(tf.keras.layers.Layer):
-    def __init__(self, layer: tf.keras.layers.Layer, N: int):
-        super(Encoder, self).__init__()
+    def __init__(
+        self, layer: tf.keras.layers.Layer, N: int, name: str = "encoder", **kwargs
+    ):
+        super(Encoder, self).__init__(name=name, **kwargs)
         self.layers = [copy.deepcopy(layer) for _ in range(N)]
         self.norm = LayerNorm(layer.size)
 
@@ -39,8 +43,10 @@ class Encoder(tf.keras.layers.Layer):
 
 
 class EncoderLayer(tf.keras.layers.Layer):
-    def __init__(self, d_model, num_head, d_ff, dropout=0.1):
-        super(EncoderLayer, self).__init__()
+    def __init__(
+        self, d_model, num_head, d_ff, dropout=0.1, name="encoder_layer", **kwargs
+    ):
+        super(EncoderLayer, self).__init__(name=name, **kwargs)
         self.size = d_model
 
         self.attention = MultiHeadAttention(d_model, num_head)
@@ -63,8 +69,10 @@ class EncoderLayer(tf.keras.layers.Layer):
 
 
 class Decoder(tf.keras.layers.Layer):
-    def __init__(self, layer: tf.keras.layers.Layer, N: int):
-        super(Decoder, self).__init__()
+    def __init__(
+        self, layer: tf.keras.layers.Layer, N: int, name: str = "decoder", **kwargs
+    ):
+        super(Decoder, self).__init__(name=name, **kwargs)
         self.layers = [copy.deepcopy(layer) for _ in range(N)]
         self.norm = LayerNorm(layer.size)
 
@@ -75,8 +83,10 @@ class Decoder(tf.keras.layers.Layer):
 
 
 class DecoderLayer(tf.keras.layers.Layer):
-    def __init__(self, d_model, num_head, d_ff, dropout=0.1):
-        super(DecoderLayer, self).__init__()
+    def __init__(
+        self, d_model, num_head, d_ff, dropout=0.1, name="decoder_layer", **kwargs
+    ):
+        super(DecoderLayer, self).__init__(name=name, **kwargs)
         self.size = d_model
 
         self.attention = MultiHeadAttention(d_model, num_head)

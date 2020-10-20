@@ -2,8 +2,8 @@ import tensorflow as tf
 
 
 class Embeddings(tf.keras.layers.Layer):
-    def __init__(self, vocab, d_model):
-        super(Embeddings, self).__init__()
+    def __init__(self, vocab, d_model, name="embeddings", **kwargs):
+        super(Embeddings, self).__init__(name=name, **kwargs)
         self.lut = tf.keras.layers.Embedding(vocab, d_model)
         self.d_model = d_model
 

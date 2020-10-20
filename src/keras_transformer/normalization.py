@@ -4,8 +4,14 @@ import tensorflow as tf
 
 
 class LayerNorm(tf.keras.layers.Layer):
-    def __init__(self, num_feat: Union[List[int], Tuple[int]], eps: float = 1e-6):
-        super(LayerNorm, self).__init__()
+    def __init__(
+        self,
+        num_feat: Union[List[int], Tuple[int]],
+        eps: float = 1e-6,
+        name: str = "LayerNorm",
+        **kwargs
+    ):
+        super(LayerNorm, self).__init__(name=name, **kwargs)
         self.a_2 = tf.ones([num_feat])
         self.b_2 = tf.zeros([num_feat])
         self.eps = eps

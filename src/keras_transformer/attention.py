@@ -38,8 +38,10 @@ def scaled_dot_product_attention(
 
 
 class MultiHeadAttention(tf.keras.layers.Layer):
-    def __init__(self, d_model, num_heads, dropout=0.1):
-        super(MultiHeadAttention, self).__init__()
+    def __init__(
+        self, d_model, num_heads, dropout=0.1, name="multihead_attention", **kwargs
+    ):
+        super(MultiHeadAttention, self).__init__(name=name, **kwargs)
         self._num_heads = num_heads
         self._d_model = d_model
         assert d_model % num_heads == 0

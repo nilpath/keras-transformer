@@ -3,8 +3,15 @@ import tensorflow as tf
 
 
 class PositionalEncoding(tf.keras.layers.Layer):
-    def __init__(self, d_model, dropout=0.1, max_length=5000):
-        super(PositionalEncoding, self).__init__()
+    def __init__(
+        self,
+        d_model,
+        dropout=0.1,
+        max_length=5000,
+        name="positional_encoding",
+        **kwargs
+    ):
+        super(PositionalEncoding, self).__init__(name=name, **kwargs)
         self.dropout = tf.keras.layers.Dropout(dropout)
 
         position = np.arange(max_length)[:, np.newaxis]
