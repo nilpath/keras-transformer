@@ -19,10 +19,7 @@ class ModelTest(tf.test.TestCase):
         model = TransformerModel(src_vocab_size, tgt_vocab_size, N=2)
         model.compile(
             optimizer=tf.keras.optimizers.Adam(),
-            loss="categorical_crossentropy",
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         )
-        # model.build([(None,), (None,), (None, None), (None, None)])
-        # model.summary()
 
-        model.fit(dataset, epochs=1)
-        # assert False
+        model.fit(dataset, epochs=3)

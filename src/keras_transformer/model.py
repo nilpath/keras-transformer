@@ -44,14 +44,17 @@ class TransformerModel(tf.keras.Model):
         return self.final_layer(decoder_output)
 
     def train_step(self, data):
-        x, y = data
-        src, tgt = x
+        src, tgt = data
+        tgt_in = tgt[:, :-1]
+        tgt_out = tgt[:, 1:]
         src_mask = create_padding_mask(src, 0)
-        tgt_mask = create_look_ahead_mask(tf.shape(tgt)[1])
+        tgt_mask = create_look_ahead_mask(tf.shape(tgt_in)[1])
 
         with tf.GradientTape() as tape:
-            y_pred = self([src, tgt, src_mask, tgt_mask], training=True)
-            loss = self.compiled_loss(y, y_pred, regularization_losses=self.losses)
+            y_pred = self([src, tgt_in, src_mask, tgt_mask], training=True)
+            loss = self.compiled_loss(
+                tgt_out, y_pred, regularization_losses=self.losses
+            )
 
         # Compute gradients
         trainable_vars = self.trainable_variables
@@ -59,6 +62,6 @@ class TransformerModel(tf.keras.Model):
         # Update weights
         self.optimizer.apply_gradients(zip(gradients, trainable_vars))
         # Update metrics (includes the metric that tracks the loss)
-        self.compiled_metrics.update_state(y, y_pred)
+        self.compiled_metrics.update_state(tgt_out, y_pred)
         # Return a dict mapping metric names to current value
         return {m.name: m.result() for m in self.metrics}
