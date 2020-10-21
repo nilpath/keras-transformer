@@ -12,7 +12,9 @@ def synthetic_data(nbatches, batch_size, vec_length, vec_min=1, vec_max=11):
     )
 
 
-def create_text_dataset(source, target, prefix=None, postfix=None):
+def create_text_dataset(
+    source, target, batch_size=64, buffer_size=20000, prefix=None, postfix=None
+):
     reserved_tokens = []
     if prefix is not None:
         source = [prefix + c for c in source]
@@ -54,8 +56,8 @@ def create_text_dataset(source, target, prefix=None, postfix=None):
         .map(tf_enc)
         .filter(max_length_filter)
         .cache()
-        .shuffle(20000)
-        .padded_batch(64)
+        .shuffle(buffer_size)
+        .padded_batch(batch_size)
     )
 
     return dataset, src_encoder, tgt_encoder
