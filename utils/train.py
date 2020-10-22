@@ -1,6 +1,7 @@
 from typing import List
 
 import tensorflow as tf
+import tensorflow_datasets as tfds
 
 from keras_transformer.data.dataset import create_text_dataset
 from keras_transformer.learning_schedules import ModelSizeSchedule
@@ -18,9 +19,16 @@ if __name__ == "__main__":
     target = load_file("./data/europarl-v7/europarl-v7.sv-en.en")[:250]  # TODO: use complete corpus
     source = load_file("./data/europarl-v7/europarl-v7.sv-en.sv")[:250]  # TODO: use complete corpus
 
-    dataset, src_encoder, tgt_encoder = create_text_dataset(
-        source, target, prefix="<SOS>", postfix="<EOS>",
-        batch_size=64, buffer_size=20000
+    src_encoder = tfds.deprecated.text.SubwordTextEncoder.load_from_file(
+        "./output/subwords/sv"
+    )
+
+    tgt_encoder = tfds.deprecated.text.SubwordTextEncoder.load_from_file(
+        "./output/subwords/en"
+    )
+
+    dataset = create_text_dataset(
+        source, target, src_encoder, tgt_encoder, batch_size=64, buffer_size=20000
     )
 
     d_model = 512

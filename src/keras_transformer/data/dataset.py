@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-import tensorflow_datasets as tfds
 
 
 def synthetic_data(nbatches, batch_size, vec_length, vec_min=1, vec_max=11):
@@ -13,26 +12,8 @@ def synthetic_data(nbatches, batch_size, vec_length, vec_min=1, vec_max=11):
 
 
 def create_text_dataset(
-    source, target, batch_size=64, buffer_size=20000, prefix=None, postfix=None
+    source, target, src_encoder, tgt_encoder, batch_size=64, buffer_size=20000
 ):
-    reserved_tokens = []
-    if prefix is not None:
-        source = [prefix + c for c in source]
-        target = [prefix + c for c in target]
-        reserved_tokens.append(prefix)
-
-    if postfix is not None:
-        source = [c + postfix for c in source]
-        target = [c + postfix for c in target]
-        reserved_tokens.append(postfix)
-
-    tgt_encoder = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
-        target, target_vocab_size=2**13, reserved_tokens=reserved_tokens
-    )
-
-    src_encoder = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
-        source, target_vocab_size=2**13, reserved_tokens=reserved_tokens
-    )
 
     def enc(source: tf.Tensor, target: tf.Tensor):
         src = src_encoder.encode(source.numpy())
@@ -60,4 +41,4 @@ def create_text_dataset(
         .padded_batch(batch_size)
     )
 
-    return dataset, src_encoder, tgt_encoder
+    return dataset

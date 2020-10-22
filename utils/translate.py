@@ -1,15 +1,8 @@
-from typing import List
-
 import tensorflow as tf
+import tensorflow_datasets as tfds
 
-from keras_transformer.data.dataset import create_text_dataset
 from keras_transformer.masking import create_look_ahead_mask, create_padding_mask
 from keras_transformer.model import TransformerModel
-
-
-def load_file(filepath: str) -> List:
-    with open(filepath, encoding="utf-8") as f:
-        return [line.rstrip("\n") for line in f]
 
 
 def translate(sentence: str, model, src_encoder, tgt_encoder) -> str:
@@ -37,17 +30,17 @@ def translate(sentence: str, model, src_encoder, tgt_encoder) -> str:
 
 if __name__ == "__main__":
 
-    target = load_file("./data/europarl-v7/europarl-v7.sv-en.en")[:250]  # TODO: use complete corpus
-    source = load_file("./data/europarl-v7/europarl-v7.sv-en.sv")[:250]  # TODO: use complete corpus
+    src_encoder = tfds.deprecated.text.SubwordTextEncoder.load_from_file(
+        "./output/subwords/sv"
+    )
 
-    dataset, src_encoder, tgt_encoder = create_text_dataset(
-        source, target, prefix="<SOS>", postfix="<EOS>",
-        batch_size=64, buffer_size=20000
+    tgt_encoder = tfds.deprecated.text.SubwordTextEncoder.load_from_file(
+        "./output/subwords/en"
     )
 
     d_model = 512
 
-    model_filepath = "./output/checkpoints/sv-en-model-04-7.69/checkpoint.ckpt"
+    model_filepath = "./output/checkpoints/sv-en-model-04-9.08/checkpoint.ckpt"
     model = TransformerModel(
         src_encoder.vocab_size, tgt_encoder.vocab_size, d_model=d_model
     )
