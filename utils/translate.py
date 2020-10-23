@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     d_model = 512
 
-    model_filepath = "./output/checkpoints/sv-en-model-04-9.08/checkpoint.ckpt"
+    model_filepath = "./output/checkpoints/sv-en-model-08-1.65/checkpoint.ckpt"
     model = TransformerModel(
         src_encoder.vocab_size, tgt_encoder.vocab_size, d_model=d_model
     )

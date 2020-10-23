@@ -12,12 +12,12 @@ def synthetic_data(nbatches, batch_size, vec_length, vec_min=1, vec_max=11):
 
 
 def create_text_dataset(
-    source, target, src_encoder, tgt_encoder, batch_size=64, buffer_size=20000
+    source, target, src_encoder, tgt_encoder, batch_size=64, seq_length=128, buffer_size=20000
 ):
 
     def enc(source: tf.Tensor, target: tf.Tensor):
-        src = src_encoder.encode(source.numpy())
-        tgt = tgt_encoder.encode(target.numpy())
+        src = src_encoder.encode("<SOS>") + src_encoder.encode(source.numpy()) + src_encoder.encode("<EOS>")
+        tgt = tgt_encoder.encode("<SOS>") + tgt_encoder.encode(target.numpy()) + tgt_encoder.encode("<EOS>")
         return src, tgt
 
     def tf_enc(source: tf.Tensor, target: tf.Tensor):
@@ -26,7 +26,7 @@ def create_text_dataset(
         tgt.set_shape([None])
         return src, tgt
 
-    def max_length_filter(source: tf.Tensor, target: tf.Tensor, max_length=40):
+    def max_length_filter(source: tf.Tensor, target: tf.Tensor, max_length=seq_length):
         return tf.logical_and(
             tf.size(source) <= max_length,
             tf.size(target) <= max_length,

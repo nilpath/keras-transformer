@@ -30,4 +30,4 @@ if __name__ == "__main__":
             outputfile = arg
 
     corpus = load_file(inputfile)
-    tokenize(corpus, prefix="<SOS>", postfix="<EOS>", output_path=outputfile)
+    tokenize(corpus, output_path=outputfile)
