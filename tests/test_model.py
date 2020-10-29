@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from keras_transformer.dataset import synthetic_data
+from keras_transformer.data.dataset import synthetic_data
 from keras_transformer.model import TransformerModel
 
 

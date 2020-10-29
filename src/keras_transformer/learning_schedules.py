@@ -11,8 +11,10 @@ class ModelSizeSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
     def __call__(self, step):
         factor = tf.cast(self._factor, tf.float32)
         model_size = tf.cast(self._model_size, tf.float32)
-        return factor * tf.math.rsqrt(model_size) * tf.minimum(
-            tf.math.rsqrt(step), step * (self._warmup_steps ** -1.5)
+        return (
+            factor
+            * tf.math.rsqrt(model_size)
+            * tf.minimum(tf.math.rsqrt(step), step * (self._warmup_steps ** -1.5))
         )
 
     def get_config(self):
