@@ -4,8 +4,8 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 
 from keras_transformer.data.dataset import create_text_dataset
-from keras_transformer.learning_schedules import ModelSizeSchedule
-from keras_transformer.losses import SparseCategoricalCrossentropy
+from keras_transformer.train.learning_schedules import ModelSizeSchedule
+from keras_transformer.train.losses import SparseCategoricalCrossentropy
 from keras_transformer.model import TransformerModel
 
 
@@ -22,11 +22,6 @@ if __name__ == "__main__":
     seq_length = 128
     d_model = 512
 
-    DATASET_SIZE = len(target)
-    train_size = int(0.7 * DATASET_SIZE)
-    val_size = int(0.15 * DATASET_SIZE)
-    test_size = int(0.15 * DATASET_SIZE)
-
     src_encoder = tfds.deprecated.text.SubwordTextEncoder.load_from_file(
         "./output/subwords/sv"
     )
@@ -36,7 +31,7 @@ if __name__ == "__main__":
     )
 
     full_dataset = create_text_dataset(
-        source, target, src_encoder, tgt_encoder, batch_size=16, seq_length=seq_length, buffer_size=20000
+        source, target, src_encoder, tgt_encoder, batch_size=64
     )
 
     learning_rate = ModelSizeSchedule(d_model)
