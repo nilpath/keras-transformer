@@ -36,9 +36,9 @@ class Encoder(tf.keras.layers.Layer):
         self.layers = [copy.deepcopy(layer) for _ in range(N)]
         self.norm = LayerNorm(layer.size)
 
-    def call(self, x, masks):
+    def call(self, x, mask):
         for layer in self.layers:
-            x = layer(x, masks)
+            x = layer(x, mask)
         return self.norm(x)  # (batch_size, input_seq_len, d_model)
 
 
@@ -57,9 +57,9 @@ class EncoderLayer(tf.keras.layers.Layer):
         self.norm2 = LayerNorm(d_model)
         self.dropout2 = tf.keras.layers.Dropout(dropout)
 
-    def call(self, x, masks):
+    def call(self, x, mask):
         x_norm = self.norm1(x)
-        out = self.attention(x_norm, x_norm, x_norm, masks)
+        out = self.attention(x_norm, x_norm, x_norm, mask)
         x = x + self.dropout1(out)
 
         x_norm = self.norm2(x)

@@ -47,8 +47,11 @@ class TransformerModel(tf.keras.Model):
         src, tgt = data
         tgt_in = tgt[:, :-1]
         tgt_out = tgt[:, 1:]
+
         src_mask = create_padding_mask(src, 0)
-        tgt_mask = create_look_ahead_mask(tf.shape(tgt_in)[1])
+        tgt_pad_mask = create_padding_mask(tgt_in, 0)
+        tgt_look_ahead_mask = create_look_ahead_mask(tf.shape(tgt_in)[1])
+        tgt_mask = tf.maximum(tgt_pad_mask, tgt_look_ahead_mask)
 
         with tf.GradientTape() as tape:
             y_pred = self([src, tgt_in, src_mask, tgt_mask], training=True)
