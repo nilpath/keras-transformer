@@ -24,7 +24,7 @@ def scaled_dot_product_attention(
     scores = tf.matmul(query, key, transpose_b=True) / tf.sqrt(dim_k)
 
     if mask is not None:
-        scores += (mask * -1e9)
+        scores += mask * -1e9
 
     p_attn = tf.nn.softmax(scores, axis=-1)
 

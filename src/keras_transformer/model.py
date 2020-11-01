@@ -81,9 +81,7 @@ class TransformerModel(tf.keras.Model):
 
         y_pred = self([src, tgt_in, src_mask, tgt_mask], training=False)
         # Updates stateful loss metrics.
-        self.compiled_loss(
-            tgt_out, y_pred, regularization_losses=self.losses
-        )
+        self.compiled_loss(tgt_out, y_pred, regularization_losses=self.losses)
 
         self.compiled_metrics.update_state(tgt_out, y_pred)
         return {m.name: m.result() for m in self.metrics}
