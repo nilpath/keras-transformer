@@ -68,3 +68,22 @@ class TransformerModel(tf.keras.Model):
         self.compiled_metrics.update_state(tgt_out, y_pred)
         # Return a dict mapping metric names to current value
         return {m.name: m.result() for m in self.metrics}
+
+    def test_step(self, data):
+        src, tgt = data
+        tgt_in = tgt[:, :-1]
+        tgt_out = tgt[:, 1:]
+
+        src_mask = create_padding_mask(src, 0)
+        tgt_pad_mask = create_padding_mask(tgt_in, 0)
+        tgt_look_ahead_mask = create_look_ahead_mask(tf.shape(tgt_in)[1])
+        tgt_mask = tf.maximum(tgt_pad_mask, tgt_look_ahead_mask)
+
+        y_pred = self([src, tgt_in, src_mask, tgt_mask], training=False)
+        # Updates stateful loss metrics.
+        self.compiled_loss(
+            tgt_out, y_pred, regularization_losses=self.losses
+        )
+
+        self.compiled_metrics.update_state(tgt_out, y_pred)
+        return {m.name: m.result() for m in self.metrics}

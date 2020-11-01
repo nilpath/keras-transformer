@@ -16,8 +16,11 @@ def load_file(filepath: str) -> List:
 
 if __name__ == "__main__":
 
-    target = load_file("./data/europarl-v7/europarl-v7.sv-en.en")  # [:250000]  # TODO: use complete corpus
-    source = load_file("./data/europarl-v7/europarl-v7.sv-en.sv")  # [:250000]  # TODO: use complete corpus
+    target = load_file("./data/europarl-v7/europarl-v7.sv-en.en")
+    source = load_file("./data/europarl-v7/europarl-v7.sv-en.sv")
+
+    train_data = (source[:128], target[:128])
+    val_data = (source[5000:5064], target[5000:5064])
 
     seq_length = 128
     d_model = 512
@@ -30,8 +33,12 @@ if __name__ == "__main__":
         "./output/subwords/en"
     )
 
-    full_dataset = create_text_dataset(
-        source, target, src_encoder, tgt_encoder, batch_size=64
+    train_dataset = create_text_dataset(
+        train_data[0], train_data[1], src_encoder, tgt_encoder, batch_size=64
+    )
+
+    val_dataset = create_text_dataset(
+        val_data[0], val_data[1], src_encoder, tgt_encoder, batch_size=64
     )
 
     learning_rate = ModelSizeSchedule(d_model)
@@ -54,7 +61,7 @@ if __name__ == "__main__":
     model.compile(
         optimizer=optimizer,
         loss=SparseCategoricalCrossentropy(masking=True, from_logits=True),
-        metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')]
+        metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name='acc')]
     )
 
     # model_filepath = "./output/checkpoints/saved/sv-en-model-08-1.65/checkpoint.ckpt"
@@ -63,7 +70,8 @@ if __name__ == "__main__":
         model.load_weights(model_filepath)
 
     model.fit(
-        full_dataset,
-        epochs=10,
+        train_dataset,
+        validation_data=val_dataset,
+        epochs=1,
         callbacks=[checkpoint_callback]
     )

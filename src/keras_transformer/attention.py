@@ -11,7 +11,7 @@ def scaled_dot_product_attention(
     dropout: tf.keras.layers.Dropout = None,
 ) -> Tuple[tf.Tensor, tf.Tensor]:
 
-    dim_k = tf.shape(query)[-1]
+    dim_k = tf.cast(tf.shape(query)[-1], tf.float32)
 
     # NOTE: Do we transpose key (K) because we want the QxK multiplication to be
     # done for corresponding token vector in each matrix Q and K ?
@@ -21,12 +21,10 @@ def scaled_dot_product_attention(
     # [word3, word3, word3]     [word1, word2, word3]
     #
 
-    scores = tf.matmul(query, key, transpose_b=True) / tf.sqrt(
-        tf.cast(dim_k, tf.float32)
-    )
+    scores = tf.matmul(query, key, transpose_b=True) / tf.sqrt(dim_k)
 
     if mask is not None:
-        scores += mask * -1e9
+        scores += (mask * -1e9)
 
     p_attn = tf.nn.softmax(scores, axis=-1)
 
