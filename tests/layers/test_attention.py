@@ -1,7 +1,10 @@
 import numpy as np
 import tensorflow as tf
 
-from keras_transformer.attention import MultiHeadAttention, scaled_dot_product_attention
+from keras_transformer.layers.attention import (
+    MultiHeadAttention,
+    scaled_dot_product_attention,
+)
 from keras_transformer.masking import create_look_ahead_mask
 
 

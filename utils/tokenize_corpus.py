@@ -2,7 +2,7 @@ from typing import List
 import sys
 import getopt
 
-from keras_transformer.data.tokenizer import tokenize
+import tensorflow_datasets as tfds
 
 
 def load_file(filepath: str) -> List:
@@ -30,4 +30,9 @@ if __name__ == "__main__":
             outputfile = arg
 
     corpus = load_file(inputfile)
-    tokenize(corpus, output_path=outputfile)
+
+    tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
+        corpus, target_vocab_size=2 ** 13, reserved_tokens=["<SOS>", "<EOS>"]
+    )
+
+    tokenizer.save_to_file(outputfile)

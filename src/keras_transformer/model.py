@@ -1,15 +1,10 @@
 import tensorflow as tf
 
-from keras_transformer.embeddings import Embeddings
-from keras_transformer.encoding import PositionalEncoding
+from keras_transformer.layers.decoder import Decoder, DecoderLayer
+from keras_transformer.layers.embeddings import Embeddings
+from keras_transformer.layers.encoder import Encoder, EncoderLayer
+from keras_transformer.layers.encoding import PositionalEncoding
 from keras_transformer.masking import create_look_ahead_mask, create_padding_mask
-from keras_transformer.transformer import (
-    Decoder,
-    DecoderLayer,
-    Encoder,
-    EncoderDecoder,
-    EncoderLayer,
-)
 
 
 class TransformerModel(tf.keras.Model):
@@ -26,21 +21,32 @@ class TransformerModel(tf.keras.Model):
         **kwargs
     ):
         super(TransformerModel, self).__init__(name=name, **kwargs)
-        self.enc_dec = EncoderDecoder(
-            Encoder(EncoderLayer(d_model, h, d_ff, dropout), N),
-            Decoder(DecoderLayer(d_model, h, d_ff, dropout), N),
-            tf.keras.Sequential(
-                [Embeddings(src_vocab, d_model), PositionalEncoding(d_model, dropout)]
-            ),
-            tf.keras.Sequential(
-                [Embeddings(tgt_vocab, d_model), PositionalEncoding(d_model, dropout)]
-            ),
+
+        self.encoder = Encoder(EncoderLayer(d_model, h, d_ff, dropout), N)
+        self.decoder = Decoder(DecoderLayer(d_model, h, d_ff, dropout), N)
+
+        self.src_embed = tf.keras.Sequential(
+            [Embeddings(src_vocab, d_model), PositionalEncoding(d_model, dropout)]
         )
+
+        self.tgt_embed = tf.keras.Sequential(
+            [Embeddings(tgt_vocab, d_model), PositionalEncoding(d_model, dropout)]
+        )
+
         self.final_layer = tf.keras.layers.Dense(tgt_vocab)
+
+    def encode(self, src, src_mask):
+        return self.encoder(self.src_embed(src), src_mask)
+
+    def decode(self, memory, src_mask, tgt, tgt_mask):
+        return self.decoder(self.tgt_embed(tgt), memory, src_mask, tgt_mask)
 
     def call(self, inputs):
         src, tgt, src_mask, tgt_mask = inputs
-        decoder_output = self.enc_dec(src, tgt, src_mask, tgt_mask)
+
+        memory = self.encode(src, src_mask)
+        decoder_output = self.decode(memory, src_mask, tgt, tgt_mask)
+
         return self.final_layer(decoder_output)
 
     def train_step(self, data):

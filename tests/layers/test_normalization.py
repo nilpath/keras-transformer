@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from keras_transformer.normalization import LayerNorm
+from keras_transformer.layers.normalization import LayerNorm
 
 
 class LayerNormTest(tf.test.TestCase):

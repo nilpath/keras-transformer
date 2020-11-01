@@ -18,8 +18,6 @@ class CreateLookAheadMaskTest(tf.test.TestCase):
 
 class CreatePaddingMaskTest(tf.test.TestCase):
     def test_create_mask(self):
-        expected_mask = tf.constant(
-            [[[[0, 0, 0, 1, 1, 1]]]]
-        )
+        expected_mask = tf.constant([[[[0, 0, 0, 1, 1, 1]]]])
         mask = create_padding_mask(tf.constant([[1, 2, 3, 0, 0, 0]]))
         self.assertAllEqual(mask, expected_mask)

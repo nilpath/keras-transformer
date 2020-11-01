@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-from keras_transformer.embeddings import Embeddings
+from keras_transformer.layers.embeddings import Embeddings
 
 
 class EmbeddingTest(tf.test.TestCase):
